@@ -316,6 +316,111 @@ function newChat() {
 document.getElementById("prompt").addEventListener("keydown", e => {
   if (e.key === "Enter") sendMessage();
 });
+<script>
+let currentMode = "chat";
+
+const API_URL = "https://skitz-ai.howell-kareem67.workers.dev";
+
+function setMode(mode) {
+  currentMode = mode;
+
+  document.getElementById("chatMode").classList.toggle(
+    "active", mode === "chat"
+  );
+
+  document.getElementById("devMode").classList.toggle(
+    "active", mode === "dev"
+  );
+
+  document.getElementById("header").textContent =
+    mode === "chat" ? "💬 AI Chat" : "💻 Developer AI";
+
+  document.getElementById("prompt").placeholder =
+    mode === "chat"
+      ? "Ask SKITZ AI anything..."
+      : "Ask about coding, Roblox, or game development...";
+}
+
+function addMessage(text, type) {
+  const messages = document.getElementById("messages");
+  const welcome = document.getElementById("welcome");
+
+  if (welcome) welcome.remove();
+
+  const div = document.createElement("div");
+  div.className = "message " + type;
+  div.textContent = text;
+
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+async function sendMessage() {
+  const input = document.getElementById("prompt");
+  const button = document.getElementById("send");
+  const text = input.value.trim();
+
+  if (!text || button.disabled) return;
+
+  addMessage(text, "user");
+  input.value = "";
+
+  button.disabled = true;
+  button.textContent = "...";
+
+  try {
+    const message =
+      currentMode === "dev"
+        ? "You are SKITZ AI Developer Mode. Help with programming, Roblox development, Lua, UI design, debugging, and game development. Explain things clearly.\n\nUser message: " + text
+        : "You are SKITZ AI, a helpful AI assistant. Be friendly, clear, and useful. The user prefers a casual style.\n\nUser message: " + text;
+
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: message
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "The AI request failed.");
+    }
+
+    if (!data.reply) {
+      throw new Error("The AI returned an empty response.");
+    }
+
+    addMessage(data.reply, "assistant");
+
+  } catch (error) {
+    console.error("SKITZ AI error:", error);
+
+    addMessage(
+      "I couldn't connect to the AI right now. Check the Worker deployment, API configuration, and billing, then try again.",
+      "assistant"
+    );
+  } finally {
+    button.disabled = false;
+    button.textContent = "Send";
+    input.focus();
+  }
+}
+
+function newChat() {
+  document.getElementById("messages").innerHTML =
+    '<div class="welcome" id="welcome">' +
+    '<h1>What\\'s up? <span class="blue">👋</span></h1>' +
+    '<p style="color:#9ba9bd;">Welcome to SKITZ AI. What are we working on today?</p>' +
+    '</div>';
+}
+
+document.getElementById("prompt").addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    sendMessage();
+  }
+});
 </script>
-</body>
-</html>
