@@ -409,18 +409,11 @@ async function sendMessage() {
     input.focus();
   }
 }
-
 function newChat() {
-  document.getElementById("messages").innerHTML =
-    '<div class="welcome" id="welcome">' +
-    '<h1>What\\'s up? <span class="blue">👋</span></h1>' +
-    '<p style="color:#9ba9bd;">Welcome to SKITZ AI. What are we working on today?</p>' +
-    '</div>';
+  document.getElementById("messages").innerHTML = `
+    <div class="welcome" id="welcome">
+      <h1>What's up? <span class="blue">👋</span></h1>
+      <p style="color:#9ba9bd;">Welcome to SKITZ AI. What are we working on today?</p>
+    </div>
+  `;
 }
-
-document.getElementById("prompt").addEventListener("keydown", event => {
-  if (event.key === "Enter") {
-    sendMessage();
-  }
-});
-</script>
